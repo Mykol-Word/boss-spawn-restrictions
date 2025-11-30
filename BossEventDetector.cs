@@ -60,6 +60,7 @@ namespace bossSpawnRestrictions
 			events.Add(new EventInfo { Name = "Frost Legion", IsModded = false });
 			events.Add(new EventInfo { Name = "Pirate Invasion", IsModded = false });
 			events.Add(new EventInfo { Name = "Martian Madness", IsModded = false });
+			events.Add(new EventInfo { Name = "Old One's Army", IsModded = false });
 			events.Add(new EventInfo { Name = "Pumpkin Moon", IsModded = false });
 			events.Add(new EventInfo { Name = "Frost Moon", IsModded = false });
 			events.Add(new EventInfo { Name = "Solar Eclipse", IsModded = false });
