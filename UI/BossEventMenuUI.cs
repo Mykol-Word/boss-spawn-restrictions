@@ -33,9 +33,10 @@ namespace bossSpawnRestrictions.UI
 
 			// list for bosses and events
 			bossEventList = new UIList();
-			bossEventList.Width.Set(-25f, 1f);
+			bossEventList.Width.Set(-35f, 1f);
 			bossEventList.Height.Set(-60f, 1f);
 			bossEventList.Top.Set(50f, 0f);
+			bossEventList.Left.Set(10f, 0f);
 			bossEventList.ListPadding = 5f;
 			bossEventList.ManualSortMethod = (list) => { };
 			mainPanel.Append(bossEventList);
@@ -58,24 +59,24 @@ namespace bossSpawnRestrictions.UI
 			bossEventList.Clear();
 
 			// add bosses section header
-			var bossHeaderItem = new BossEventItem("=== BOSSES ===", false, true);
+			var bossHeaderItem = new BossEventItem("BOSSES", false, true);
 			bossEventList.Add(bossHeaderItem);
 
 			var bosses = BossEventDetector.GetAllBosses();
 			foreach (var boss in bosses)
 			{
-				var bossItem = new BossEventItem(boss.Name, boss.IsModded, false);
+				var bossItem = new BossEventItem(boss.Name, boss.IsModded, false, true);
 				bossEventList.Add(bossItem);
 			}
 
 			// add events section header
-			var eventHeaderItem = new BossEventItem("=== EVENTS ===", false, true);
+			var eventHeaderItem = new BossEventItem("EVENTS", false, true);
 			bossEventList.Add(eventHeaderItem);
 
 			var events = BossEventDetector.GetAllEvents();
 			foreach (var evt in events)
 			{
-				var eventItem = new BossEventItem(evt.Name, evt.IsModded, false);
+				var eventItem = new BossEventItem(evt.Name, evt.IsModded, false, false);
 				bossEventList.Add(eventItem);
 			}
 		}
@@ -91,47 +92,138 @@ namespace bossSpawnRestrictions.UI
 		private readonly string itemName;
 		private readonly bool isModded;
 		private readonly bool isHeader;
+		private readonly bool isBoss;
+		private UIText nameText;
+		private UIText moddedLabel;
+		private bool isRestricted = false;
 
-		public BossEventItem(string name, bool modded, bool header = false)
+		public BossEventItem(string name, bool modded, bool header = false, bool boss = true)
 		{
 			itemName = name;
 			isModded = modded;
 			isHeader = header;
+			isBoss = boss;
+
+			// load existing restriction state
+			if (!header)
+			{
+				isRestricted = isBoss ? SpawnRestrictionTracker.IsBossRestricted(name) : SpawnRestrictionTracker.IsEventRestricted(name);
+			}
 
 			Width.Set(0, 1f);
-			Height.Set(30f, 0f);
-			BackgroundColor = new Color(35, 40, 83) * 0.8f;
-			BorderColor = new Color(18, 18, 38);
+			Height.Set(header ? 35f : 30f, 0f);
 
-			var text = new UIText(name, header ? 1f : 0.9f);
-			text.Left.Set(10f, 0f);
-			text.VAlign = 0.5f;
-			text.TextColor = header ? Color.Gold : (modded ? new Color(150, 255, 150) : Color.White);
-			Append(text);
-
-			if (modded && !header)
+			if (header)
 			{
-				var moddedLabel = new UIText("[MODDED]", 0.7f);
-				moddedLabel.HAlign = 1f;
-				moddedLabel.VAlign = 0.5f;
-				moddedLabel.Left.Set(-10f, 0f);
-				moddedLabel.TextColor = new Color(100, 200, 100);
-				Append(moddedLabel);
+				BackgroundColor = new Color(50, 65, 120) * 0.9f;
+				BorderColor = new Color(89, 116, 213);
+
+				var text = new UIText(name, 1.1f);
+				text.HAlign = 0.5f;
+				text.VAlign = 0.5f;
+				text.TextColor = Color.Gold;
+				Append(text);
+			}
+			else
+			{
+				SetPadding(5f);
+				UpdateColors();
+
+				nameText = new UIText(name, 0.9f);
+				nameText.Left.Set(10f, 0f);
+				nameText.VAlign = 0.5f;
+				Append(nameText);
+
+				if (modded)
+				{
+					moddedLabel = new UIText("[MODDED]", 0.7f);
+					moddedLabel.HAlign = 1f;
+					moddedLabel.VAlign = 0.5f;
+					moddedLabel.Left.Set(-10f, 0f);
+					Append(moddedLabel);
+				}
+
+				UpdateTextColors();
+			}
+		}
+
+		private void UpdateColors()
+		{
+			if (isRestricted)
+			{
+				BackgroundColor = new Color(80, 30, 30) * 0.8f;
+				BorderColor = new Color(120, 40, 40);
+			}
+			else
+			{
+				BackgroundColor = new Color(30, 80, 30) * 0.8f;
+				BorderColor = new Color(40, 120, 40);
+			}
+		}
+
+		private void UpdateTextColors()
+		{
+			if (isRestricted)
+			{
+				nameText.TextColor = isModded ? new Color(200, 130, 130) : new Color(255, 180, 180);
+				if (moddedLabel != null)
+					moddedLabel.TextColor = new Color(150, 100, 100);
+			}
+			else
+			{
+				nameText.TextColor = isModded ? new Color(130, 200, 130) : new Color(180, 255, 180);
+				if (moddedLabel != null)
+					moddedLabel.TextColor = new Color(100, 150, 100);
 			}
 		}
 
 		public override void MouseOver(UIMouseEvent evt)
 		{
 			base.MouseOver(evt);
-			BackgroundColor = new Color(44, 57, 105) * 0.9f;
-			BorderColor = new Color(89, 116, 213);
+			if (!isHeader)
+			{
+				if (isRestricted)
+				{
+					BackgroundColor = new Color(100, 40, 40) * 0.9f;
+					BorderColor = new Color(150, 60, 60);
+				}
+				else
+				{
+					BackgroundColor = new Color(40, 100, 40) * 0.9f;
+					BorderColor = new Color(60, 150, 60);
+				}
+			}
 		}
 
 		public override void MouseOut(UIMouseEvent evt)
 		{
 			base.MouseOut(evt);
-			BackgroundColor = new Color(35, 40, 83) * 0.8f;
-			BorderColor = new Color(18, 18, 38);
+			if (!isHeader)
+			{
+				UpdateColors();
+			}
+		}
+
+		public override void LeftClick(UIMouseEvent evt)
+		{
+			base.LeftClick(evt);
+			if (!isHeader)
+			{
+				isRestricted = !isRestricted;
+
+				// update tracker
+				if (isBoss)
+				{
+					SpawnRestrictionTracker.SetBossRestriction(itemName, isRestricted);
+				}
+				else
+				{
+					SpawnRestrictionTracker.SetEventRestriction(itemName, isRestricted);
+				}
+
+				UpdateColors();
+				UpdateTextColors();
+			}
 		}
 	}
 }
