@@ -17,7 +17,7 @@ namespace bossSpawnRestrictions
 				{
 					string bossName = npc.FullName;
 
-					if (SpawnRestrictionTracker.IsBossRestricted(bossName))
+					if (VotingSystem.IsRestricted(bossName, true))
 					{
 						// despawn the boss without marking as defeated
 						npc.active = false;
@@ -41,31 +41,31 @@ namespace bossSpawnRestrictions
 		private void CheckAndEndEvents()
 		{
 			// goblin army
-			if (Main.invasionType == InvasionID.GoblinArmy && SpawnRestrictionTracker.IsEventRestricted("Goblin Army"))
+			if (Main.invasionType == InvasionID.GoblinArmy && VotingSystem.IsRestricted("Goblin Army", false))
 			{
 				EndInvasion();
 			}
 
 			// frost legion
-			if (Main.invasionType == InvasionID.SnowLegion && SpawnRestrictionTracker.IsEventRestricted("Frost Legion"))
+			if (Main.invasionType == InvasionID.SnowLegion && VotingSystem.IsRestricted("Frost Legion", false))
 			{
 				EndInvasion();
 			}
 
 			// pirate invasion
-			if (Main.invasionType == InvasionID.PirateInvasion && SpawnRestrictionTracker.IsEventRestricted("Pirate Invasion"))
+			if (Main.invasionType == InvasionID.PirateInvasion && VotingSystem.IsRestricted("Pirate Invasion", false))
 			{
 				EndInvasion();
 			}
 
 			// martian madness
-			if (Main.invasionType == InvasionID.MartianMadness && SpawnRestrictionTracker.IsEventRestricted("Martian Madness"))
+			if (Main.invasionType == InvasionID.MartianMadness && VotingSystem.IsRestricted("Martian Madness", false))
 			{
 				EndInvasion();
 			}
 
 			// old one's army
-			if (Terraria.GameContent.Events.DD2Event.Ongoing && SpawnRestrictionTracker.IsEventRestricted("Old One's Army"))
+			if (Terraria.GameContent.Events.DD2Event.Ongoing && VotingSystem.IsRestricted("Old One's Army", false))
 			{
 				Terraria.GameContent.Events.DD2Event.StopInvasion();
 				if (Main.netMode == NetmodeID.Server)
@@ -75,7 +75,7 @@ namespace bossSpawnRestrictions
 			}
 
 			// pumpkin moon
-			if (Main.pumpkinMoon && SpawnRestrictionTracker.IsEventRestricted("Pumpkin Moon"))
+			if (Main.pumpkinMoon && VotingSystem.IsRestricted("Pumpkin Moon", false))
 			{
 				Main.pumpkinMoon = false;
 				Main.stopMoonEvent();
@@ -86,7 +86,7 @@ namespace bossSpawnRestrictions
 			}
 
 			// frost moon
-			if (Main.snowMoon && SpawnRestrictionTracker.IsEventRestricted("Frost Moon"))
+			if (Main.snowMoon && VotingSystem.IsRestricted("Frost Moon", false))
 			{
 				Main.snowMoon = false;
 				Main.stopMoonEvent();
@@ -97,7 +97,7 @@ namespace bossSpawnRestrictions
 			}
 
 			// solar eclipse
-			if (Main.eclipse && SpawnRestrictionTracker.IsEventRestricted("Solar Eclipse"))
+			if (Main.eclipse && VotingSystem.IsRestricted("Solar Eclipse", false))
 			{
 				Main.eclipse = false;
 				if (Main.netMode == NetmodeID.Server)
@@ -107,7 +107,7 @@ namespace bossSpawnRestrictions
 			}
 
 			// blood moon
-			if (Main.bloodMoon && SpawnRestrictionTracker.IsEventRestricted("Blood Moon"))
+			if (Main.bloodMoon && VotingSystem.IsRestricted("Blood Moon", false))
 			{
 				Main.bloodMoon = false;
 				if (Main.netMode == NetmodeID.Server)
@@ -117,7 +117,7 @@ namespace bossSpawnRestrictions
 			}
 
 			// rain
-			if (Main.raining && SpawnRestrictionTracker.IsEventRestricted("Rain"))
+			if (Main.raining && VotingSystem.IsRestricted("Rain", false))
 			{
 				Main.StopRain();
 				if (Main.netMode == NetmodeID.Server)
@@ -127,7 +127,7 @@ namespace bossSpawnRestrictions
 			}
 
 			// sandstorm
-			if (Terraria.GameContent.Events.Sandstorm.Happening && SpawnRestrictionTracker.IsEventRestricted("Sandstorm"))
+			if (Terraria.GameContent.Events.Sandstorm.Happening && VotingSystem.IsRestricted("Sandstorm", false))
 			{
 				Terraria.GameContent.Events.Sandstorm.Happening = false;
 				if (Main.netMode == NetmodeID.Server)
@@ -137,7 +137,7 @@ namespace bossSpawnRestrictions
 			}
 
 			// slime rain
-			if (Main.slimeRain && SpawnRestrictionTracker.IsEventRestricted("Slime Rain"))
+			if (Main.slimeRain && VotingSystem.IsRestricted("Slime Rain", false))
 			{
 				Main.StopSlimeRain();
 				if (Main.netMode == NetmodeID.Server)
@@ -147,7 +147,7 @@ namespace bossSpawnRestrictions
 			}
 
 			// lantern night
-			if (Terraria.GameContent.Events.LanternNight.LanternsUp && SpawnRestrictionTracker.IsEventRestricted("Lantern Night"))
+			if (Terraria.GameContent.Events.LanternNight.LanternsUp && VotingSystem.IsRestricted("Lantern Night", false))
 			{
 				Terraria.GameContent.Events.LanternNight.WorldClear();
 				if (Main.netMode == NetmodeID.Server)
@@ -157,7 +157,7 @@ namespace bossSpawnRestrictions
 			}
 
 			// party
-			if (Terraria.GameContent.Events.BirthdayParty.PartyIsUp && SpawnRestrictionTracker.IsEventRestricted("Party"))
+			if (Terraria.GameContent.Events.BirthdayParty.PartyIsUp && VotingSystem.IsRestricted("Party", false))
 			{
 				Terraria.GameContent.Events.BirthdayParty.WorldClear();
 				if (Main.netMode == NetmodeID.Server)

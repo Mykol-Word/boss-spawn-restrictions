@@ -1,15 +1,33 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 using Terraria.ModLoader;
 
 namespace bossSpawnRestrictions
 {
-	// Please read https://github.com/tModLoader/tModLoader/wiki/Basic-tModLoader-Modding-Guide#mod-skeleton-contents for more information about the various files in a mod.
 	public class bossSpawnRestrictions : Mod
 	{
+		public override void HandlePacket(BinaryReader reader, int whoAmI)
+		{
+			byte packetType = reader.ReadByte();
 
+			if (packetType == 0) // vote packet
+			{
+				bool isBoss = reader.ReadBoolean();
+				string name = reader.ReadString();
+				bool restricted = reader.ReadBoolean();
+
+				VotingSystem.ReceiveVote(whoAmI, name, restricted, isBoss);
+
+				// server forwards to other clients
+				if (Terraria.Main.netMode == Terraria.ID.NetmodeID.Server)
+				{
+					ModPacket packet = GetPacket();
+					packet.Write((byte)0);
+					packet.Write(isBoss);
+					packet.Write(name);
+					packet.Write(restricted);
+					packet.Send(-1, whoAmI); // send to all except sender
+				}
+			}
+		}
 	}
 }

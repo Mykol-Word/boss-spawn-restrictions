@@ -9,14 +9,14 @@ namespace bossSpawnRestrictions.UI
 {
 	public class BossEventMenuUI : UIState
 	{
-		private UIPanel mainPanel;
+		private DraggableUIPanel mainPanel;
 		private UIList bossEventList;
 		private UIScrollbar scrollbar;
 
 		public override void OnInitialize()
 		{
 			// main container panel
-			mainPanel = new UIPanel();
+			mainPanel = new DraggableUIPanel();
 			mainPanel.SetPadding(0);
 			mainPanel.Left.Set(400f, 0f);
 			mainPanel.Top.Set(200f, 0f);
@@ -95,6 +95,7 @@ namespace bossSpawnRestrictions.UI
 		private readonly bool isBoss;
 		private UIText nameText;
 		private UIText moddedLabel;
+		private UIText voteText;
 		private bool isRestricted = false;
 
 		public BossEventItem(string name, bool modded, bool header = false, bool boss = true)
@@ -104,7 +105,7 @@ namespace bossSpawnRestrictions.UI
 			isHeader = header;
 			isBoss = boss;
 
-			// load existing restriction state
+			// load existing local vote state
 			if (!header)
 			{
 				isRestricted = isBoss ? SpawnRestrictionTracker.IsBossRestricted(name) : SpawnRestrictionTracker.IsEventRestricted(name);
@@ -134,6 +135,14 @@ namespace bossSpawnRestrictions.UI
 				nameText.VAlign = 0.5f;
 				Append(nameText);
 
+				// vote fraction display
+				voteText = new UIText("0/0", 0.8f);
+				voteText.HAlign = 1f;
+				voteText.VAlign = 0.5f;
+				voteText.Left.Set(modded ? -85f : -10f, 0f);
+				voteText.TextColor = Color.LightGray;
+				Append(voteText);
+
 				if (modded)
 				{
 					moddedLabel = new UIText("[MODDED]", 0.7f);
@@ -142,6 +151,8 @@ namespace bossSpawnRestrictions.UI
 					moddedLabel.Left.Set(-10f, 0f);
 					Append(moddedLabel);
 				}
+
+				UpdateVoteDisplay();
 
 				UpdateTextColors();
 			}
@@ -163,7 +174,10 @@ namespace bossSpawnRestrictions.UI
 
 		private void UpdateTextColors()
 		{
-			if (isRestricted)
+			// check actual restriction status from voting
+			bool actuallyRestricted = VotingSystem.IsRestricted(itemName, isBoss);
+
+			if (actuallyRestricted)
 			{
 				nameText.TextColor = isModded ? new Color(200, 130, 130) : new Color(255, 180, 180);
 				if (moddedLabel != null)
@@ -174,6 +188,15 @@ namespace bossSpawnRestrictions.UI
 				nameText.TextColor = isModded ? new Color(130, 200, 130) : new Color(180, 255, 180);
 				if (moddedLabel != null)
 					moddedLabel.TextColor = new Color(100, 150, 100);
+			}
+		}
+
+		private void UpdateVoteDisplay()
+		{
+			if (voteText != null)
+			{
+				var (votesFor, totalPlayers) = VotingSystem.GetVotes(itemName, isBoss);
+				voteText.SetText($"{votesFor}/{totalPlayers}");
 			}
 		}
 
@@ -221,8 +244,62 @@ namespace bossSpawnRestrictions.UI
 					SpawnRestrictionTracker.SetEventRestriction(itemName, isRestricted);
 				}
 
+				// send vote to voting system
+				VotingSystem.SetLocalVote(itemName, isRestricted, isBoss);
+
 				UpdateColors();
 				UpdateTextColors();
+				UpdateVoteDisplay();
+			}
+		}
+	}
+
+	public class DraggableUIPanel : UIPanel
+	{
+		private Vector2 offset;
+		private bool dragging;
+
+		public override void LeftMouseDown(UIMouseEvent evt)
+		{
+			base.LeftMouseDown(evt);
+			DragStart(evt);
+		}
+
+		public override void LeftMouseUp(UIMouseEvent evt)
+		{
+			base.LeftMouseUp(evt);
+			DragEnd(evt);
+		}
+
+		private void DragStart(UIMouseEvent evt)
+		{
+			offset = new Vector2(evt.MousePosition.X - Left.Pixels, evt.MousePosition.Y - Top.Pixels);
+			dragging = true;
+		}
+
+		private void DragEnd(UIMouseEvent evt)
+		{
+			dragging = false;
+		}
+
+		public override void Update(GameTime gameTime)
+		{
+			base.Update(gameTime);
+
+			if (dragging)
+			{
+				Left.Set(Main.mouseX - offset.X, 0f);
+				Top.Set(Main.mouseY - offset.Y, 0f);
+				Recalculate();
+			}
+
+			// keep panel on screen
+			var parentSpace = Parent.GetDimensions().ToRectangle();
+			if (!GetDimensions().ToRectangle().Intersects(parentSpace))
+			{
+				Left.Pixels = Utils.Clamp(Left.Pixels, 0, parentSpace.Right - Width.Pixels);
+				Top.Pixels = Utils.Clamp(Top.Pixels, 0, parentSpace.Bottom - Height.Pixels);
+				Recalculate();
 			}
 		}
 	}
