@@ -1,0 +1,3 @@
+displayName = Boss Spawn Restrictions
+author = mykol-word
+version = 0.1
