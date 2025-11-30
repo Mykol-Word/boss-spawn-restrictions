@@ -1,1 +1,10 @@
-Modify this file with a description of your mod.
+Boss & Event Spawn Restrictions
+
+This mod lets players vote on which bosses and events are allowed to spawn in your world.
+
+Features:
+- Draggable in-game menu displaying all bosses and events
+- Democratic voting system: majority vote determines restrictions
+- Works in both singleplayer and multiplayer
+- Supports vanilla and modded content (-ish)
+- Restricted bosses and events are prevented from spawning
