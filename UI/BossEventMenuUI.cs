@@ -2,7 +2,9 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using Terraria;
+using Terraria.Audio;
 using Terraria.GameContent.UI.Elements;
+using Terraria.ID;
 using Terraria.UI;
 
 namespace bossSpawnRestrictions.UI
@@ -20,7 +22,7 @@ namespace bossSpawnRestrictions.UI
 			mainPanel.SetPadding(0);
 			mainPanel.Left.Set(400f, 0f);
 			mainPanel.Top.Set(200f, 0f);
-			mainPanel.Width.Set(600f, 0f);
+			mainPanel.Width.Set(360f, 0f);
 			mainPanel.Height.Set(400f, 0f);
 			mainPanel.BackgroundColor = new Color(73, 94, 171) * 0.95f;
 			Append(mainPanel);
@@ -242,6 +244,8 @@ namespace bossSpawnRestrictions.UI
 			base.LeftClick(evt);
 			if (!isHeader)
 			{
+				SoundEngine.PlaySound(SoundID.MenuTick);
+
 				isRestricted = !isRestricted;
 
 				// update tracker
@@ -295,6 +299,11 @@ namespace bossSpawnRestrictions.UI
 		public override void Update(GameTime gameTime)
 		{
 			base.Update(gameTime);
+
+			if (ContainsPoint(Main.MouseScreen))
+			{
+				Main.LocalPlayer.mouseInterface = true;
+			}
 
 			if (dragging)
 			{
