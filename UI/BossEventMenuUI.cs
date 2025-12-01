@@ -261,6 +261,9 @@ namespace bossSpawnRestrictions.UI
 				// send vote to voting system
 				VotingSystem.SetLocalVote(itemName, isRestricted, isBoss);
 
+				// save to character
+				PlayerVoteData.SaveVote(itemName, isRestricted, isBoss);
+
 				UpdateColors();
 				UpdateTextColors();
 				UpdateVoteDisplay();
