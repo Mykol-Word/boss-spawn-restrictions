@@ -227,6 +227,16 @@ namespace bossSpawnRestrictions.UI
 			}
 		}
 
+		public override void Update(GameTime gameTime)
+		{
+			base.Update(gameTime);
+			if (!isHeader)
+			{
+				UpdateVoteDisplay();
+				UpdateTextColors();
+			}
+		}
+
 		public override void LeftClick(UIMouseEvent evt)
 		{
 			base.LeftClick(evt);

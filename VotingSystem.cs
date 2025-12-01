@@ -44,14 +44,24 @@ namespace bossSpawnRestrictions
 			}
 
 			// send vote to server/clients
-			if (Main.netMode != NetmodeID.SinglePlayer)
+			if (Main.netMode == NetmodeID.MultiplayerClient)
 			{
 				ModPacket packet = ModContent.GetInstance<bossSpawnRestrictions>().GetPacket();
-				packet.Write((byte)0); // vote packet type
+				packet.Write((byte)0);
 				packet.Write(isBoss);
 				packet.Write(name);
 				packet.Write(restricted);
 				packet.Send();
+			}
+			else if (Main.netMode == NetmodeID.Server)
+			{
+				// forward to all clients when called from server
+				ModPacket packet = ModContent.GetInstance<bossSpawnRestrictions>().GetPacket();
+				packet.Write((byte)0);
+				packet.Write(isBoss);
+				packet.Write(name);
+				packet.Write(restricted);
+				packet.Send(-1, -1);
 			}
 		}
 

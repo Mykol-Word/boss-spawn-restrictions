@@ -17,7 +17,7 @@ namespace bossSpawnRestrictions
 
 				VotingSystem.ReceiveVote(whoAmI, name, restricted, isBoss);
 
-				// server forwards to other clients
+				// server forwards to all clients
 				if (Terraria.Main.netMode == Terraria.ID.NetmodeID.Server)
 				{
 					ModPacket packet = GetPacket();
@@ -25,7 +25,7 @@ namespace bossSpawnRestrictions
 					packet.Write(isBoss);
 					packet.Write(name);
 					packet.Write(restricted);
-					packet.Send(-1, whoAmI); // send to all except sender
+					packet.Send(-1, -1);
 				}
 			}
 		}
