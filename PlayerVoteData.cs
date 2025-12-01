@@ -46,6 +46,9 @@ namespace bossSpawnRestrictions
 				SpawnRestrictionTracker.SetEventRestriction(vote.Key, vote.Value);
 				VotingSystem.SetLocalVote(vote.Key, vote.Value, false);
 			}
+
+			// request full sync from server to get other players' votes
+			VotingSystem.RequestSync();
 		}
 
 		public static void SaveVote(string name, bool restricted, bool isBoss)

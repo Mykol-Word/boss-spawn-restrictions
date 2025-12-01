@@ -51,6 +51,7 @@ namespace bossSpawnRestrictions
 				packet.Write(isBoss);
 				packet.Write(name);
 				packet.Write(restricted);
+				packet.Write(myPlayer);
 				packet.Send();
 			}
 			else if (Main.netMode == NetmodeID.Server)
@@ -61,6 +62,7 @@ namespace bossSpawnRestrictions
 				packet.Write(isBoss);
 				packet.Write(name);
 				packet.Write(restricted);
+				packet.Write(myPlayer);
 				packet.Send(-1, -1);
 			}
 		}
@@ -116,6 +118,51 @@ namespace bossSpawnRestrictions
 
 			// majority (rounded up from 1/2) - half or more restricts (ties restrict)
 			return votesFor >= (totalPlayers + 1) / 2;
+		}
+
+		public static void SendFullSyncToPlayer(int toPlayer)
+		{
+			// send all boss votes
+			foreach (var playerVotes in playerBossVotes)
+			{
+				int playerIndex = playerVotes.Key;
+				foreach (var vote in playerVotes.Value)
+				{
+					ModPacket packet = ModContent.GetInstance<bossSpawnRestrictions>().GetPacket();
+					packet.Write((byte)0);
+					packet.Write(true); // isBoss
+					packet.Write(vote.Key); // name
+					packet.Write(vote.Value); // restricted
+					packet.Write(playerIndex);
+					packet.Send(toPlayer);
+				}
+			}
+
+			// send all event votes
+			foreach (var playerVotes in playerEventVotes)
+			{
+				int playerIndex = playerVotes.Key;
+				foreach (var vote in playerVotes.Value)
+				{
+					ModPacket packet = ModContent.GetInstance<bossSpawnRestrictions>().GetPacket();
+					packet.Write((byte)0);
+					packet.Write(false); // isBoss
+					packet.Write(vote.Key); // name
+					packet.Write(vote.Value); // restricted
+					packet.Write(playerIndex);
+					packet.Send(toPlayer);
+				}
+			}
+		}
+
+		public static void RequestSync()
+		{
+			if (Main.netMode == NetmodeID.MultiplayerClient)
+			{
+				ModPacket packet = ModContent.GetInstance<bossSpawnRestrictions>().GetPacket();
+				packet.Write((byte)1); // sync request
+				packet.Send();
+			}
 		}
 	}
 

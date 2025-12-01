@@ -14,10 +14,15 @@ namespace bossSpawnRestrictions
 				bool isBoss = reader.ReadBoolean();
 				string name = reader.ReadString();
 				bool restricted = reader.ReadBoolean();
+				int playerIndex = reader.ReadInt32();
 
-				VotingSystem.ReceiveVote(whoAmI, name, restricted, isBoss);
+				// server receives from client: whoAmI is the sender
+				// client receives from server: playerIndex is the sender
+				int actualPlayer = Terraria.Main.netMode == Terraria.ID.NetmodeID.Server ? whoAmI : playerIndex;
 
-				// server forwards to all clients
+				VotingSystem.ReceiveVote(actualPlayer, name, restricted, isBoss);
+
+				// server forwards to all clients with player index
 				if (Terraria.Main.netMode == Terraria.ID.NetmodeID.Server)
 				{
 					ModPacket packet = GetPacket();
@@ -25,7 +30,15 @@ namespace bossSpawnRestrictions
 					packet.Write(isBoss);
 					packet.Write(name);
 					packet.Write(restricted);
+					packet.Write(whoAmI); // include player index
 					packet.Send(-1, -1);
+				}
+			}
+			else if (packetType == 1) // sync request from client
+			{
+				if (Terraria.Main.netMode == Terraria.ID.NetmodeID.Server)
+				{
+					VotingSystem.SendFullSyncToPlayer(whoAmI);
 				}
 			}
 		}
