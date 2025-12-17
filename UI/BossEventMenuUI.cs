@@ -14,6 +14,7 @@ namespace bossSpawnRestrictions.UI
 		private DraggableUIPanel mainPanel;
 		private UIList bossEventList;
 		private UIScrollbar scrollbar;
+		private UIText titleText;
 
 		public override void OnInitialize()
 		{
@@ -28,10 +29,10 @@ namespace bossSpawnRestrictions.UI
 			Append(mainPanel);
 
 			// title
-			var title = new UIText("Bosses & Events", 1.2f);
-			title.HAlign = 0.5f;
-			title.Top.Set(15f, 0f);
-			mainPanel.Append(title);
+			titleText = new UIText("Bosses & Events", 1.2f);
+			titleText.HAlign = 0.5f;
+			titleText.Top.Set(15f, 0f);
+			mainPanel.Append(titleText);
 
 			// list for bosses and events
 			bossEventList = new UIList();
@@ -86,6 +87,23 @@ namespace bossSpawnRestrictions.UI
 		public void RefreshList()
 		{
 			PopulateList();
+		}
+
+		public override void Update(GameTime gameTime)
+		{
+			base.Update(gameTime);
+
+			// update title based on config mode
+			if (ServerConfig.IsServerMode())
+			{
+				titleText.SetText("Bosses & Events [SERVER MODE]");
+				titleText.TextColor = new Color(255, 200, 100);
+			}
+			else
+			{
+				titleText.SetText("Bosses & Events");
+				titleText.TextColor = Color.White;
+			}
 		}
 	}
 
@@ -197,8 +215,16 @@ namespace bossSpawnRestrictions.UI
 		{
 			if (voteText != null)
 			{
-				var (votesFor, totalPlayers) = VotingSystem.GetVotes(itemName, isBoss);
-				voteText.SetText($"{votesFor}/{totalPlayers}");
+				// hide votes in server mode
+				if (ServerConfig.IsServerMode())
+				{
+					voteText.SetText("");
+				}
+				else
+				{
+					var (votesFor, totalPlayers) = VotingSystem.GetVotes(itemName, isBoss);
+					voteText.SetText($"{votesFor}/{totalPlayers}");
+				}
 			}
 		}
 
@@ -244,6 +270,10 @@ namespace bossSpawnRestrictions.UI
 			base.LeftClick(evt);
 			if (!isHeader)
 			{
+				// disable voting in server mode
+				if (ServerConfig.IsServerMode())
+					return;
+
 				SoundEngine.PlaySound(SoundID.MenuTick);
 
 				isRestricted = !isRestricted;

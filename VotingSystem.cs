@@ -111,6 +111,13 @@ namespace bossSpawnRestrictions
 
 		public static bool IsRestricted(string name, bool isBoss)
 		{
+			// use server config if in server-based mode
+			if (ServerConfig.IsServerMode())
+			{
+				return ServerConfig.IsRestricted(name, isBoss);
+			}
+
+			// otherwise use democratic voting
 			var (votesFor, totalPlayers) = GetVotes(name, isBoss);
 
 			if (totalPlayers == 0)
