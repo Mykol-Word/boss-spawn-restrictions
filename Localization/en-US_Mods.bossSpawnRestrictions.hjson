@@ -1,1 +1,50 @@
 "Keybinds.Open Boss/Event Menu.DisplayName": Open Boss/Event Menu
+
+Configs: {
+	RestrictionMode: {
+		ServerBased: {
+			Tooltip: ""
+			Label: Server Based
+		}
+
+		Democratic: {
+			Tooltip: ""
+			Label: Democratic
+		}
+
+		Tooltip: ""
+	}
+
+	ServerConfig: {
+		DisplayName: Server Config
+
+		RestrictionModeValue: {
+			Label: Restriction Mode
+			Tooltip:
+				'''
+				democratic: players vote on restrictions
+				server-based: use the lists below
+				'''
+		}
+
+		RestrictedBosses: {
+			Label: Restricted Bosses
+			Tooltip: bosses to restrict when using server-based mode
+		}
+
+		RestrictedEvents: {
+			Label: Restricted Events
+			Tooltip: events to restrict when using server-based mode
+		}
+
+		BossRestrictions: {
+			Label: Boss Restrictions
+			Tooltip: true = restricted, false = allowed
+		}
+
+		EventRestrictions: {
+			Label: Event Restrictions
+			Tooltip: true = restricted, false = allowed
+		}
+	}
+}
